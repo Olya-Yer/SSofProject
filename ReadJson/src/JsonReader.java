@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -42,27 +43,27 @@ public class JsonReader {
 		Scanner sc = new Scanner(System.in);
 		String filename = sc.nextLine();
 		
-		//String content = new String(Files.readAllBytes(Paths.get(filename, null)));
+		//String content = new String(Files.readAllBytes(Paths.get(filename)));
+		
+		String content="";
+		
+		try
+	    {
+			content = new String(Files.readAllBytes(Paths.get("C:/Users/test/workspace/ReadJson/src/"+filename)));
+	    }
+	    catch (IOException e)
+	    {
+	        e.printStackTrace();
+	    }
+	
 		
 		
 		
 		
-		JsonParser parser = new JsonParser();
-		 
-        try {
- 
-            Object obj = parser.parse(new FileReader(filename));
- 
-            JsonObject jsonObject = (JsonObject) obj;
- 
-           // String content = jsonObject.toString();
-            sc.close();
-            return jsonObject;
-            
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		
+		JsonObject jo;
+        JsonElement je = new JsonParser().parse(content);
+        jo = je.getAsJsonObject();
 		
 		
 		
@@ -77,7 +78,7 @@ public class JsonReader {
 		
 		//JsonObject fileAsJson = (new JsonParser().parse(content)).getAsJsonObject();
         sc.close();
-		return null;
+		return jo;
 		
 	}
 
