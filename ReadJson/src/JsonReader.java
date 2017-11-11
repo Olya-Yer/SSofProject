@@ -16,6 +16,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+// TEST COMMAND FOR GIT PUSH
+
 public class JsonReader {
 
 	public void start() throws IOException {
@@ -49,7 +51,7 @@ public class JsonReader {
 		
 		//String content = new String(Files.readAllBytes(Paths.get(filename)));
 		
-		String content="";
+		String content = "";
 		
 		try
 	    {
