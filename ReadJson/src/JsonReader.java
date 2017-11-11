@@ -18,7 +18,13 @@ public class JsonReader {
 
 		JsonObject theWholeFile = readFile();
 		if (theWholeFile != null) {
-			System.out.println(theWholeFile.toString());
+		
+		// works	//System.out.println(theWholeFile.toString());
+		
+			System.out.print(getChildren(theWholeFile).toString());
+		// works	//System.out.print(getKind(theWholeFile));
+			
+			
 		} else {
 			System.out.println("Could not read the file!");
 		}
@@ -80,6 +86,12 @@ public class JsonReader {
         sc.close();
 		return jo;
 		
+	}
+	private static Object getChildren(JsonObject j) {
+
+		JsonObject children = j.get("children").getAsJsonObject();
+
+		return children;
 	}
 
 	private static Object getLeft(JsonObject j) {
