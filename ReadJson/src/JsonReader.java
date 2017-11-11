@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -12,19 +11,18 @@ import com.google.gson.JsonParser;
 
 public class JsonReader {
 
-	public void start() throws IOException {
+	public static void start() throws IOException {
 
 		JsonObject theWholeFile = readFile();
 		if (theWholeFile != null) {
-
-			// System.out.println(theWholeFile.toString());
-			// System.out.print(getChildren(theWholeFile));
+			// System.out.println("The whole File:\n" + theWholeFile.toString());
+			// System.out.print("The whole File CHILDREN:\n" + getChildren(theWholeFile));
 
 			JsonArray children = getChildren(theWholeFile);
 			JsonObject child0 = (JsonObject) children.get(0);
-			// System.out.print(getKind(child1));
-			// System.out.println(getRight(child0).toString());
-			System.out.println(getName(getWhat(getRight(child0))).toString());
+			// System.out.print("Child0:\n" + getKind(child0));
+			// System.out.println("Child.getRight:\n" + getRight(child0).toString());
+			System.out.println("Child.getName:\n" + getName(getWhat(getRight(child0))).toString());
 
 		} else {
 			System.out.println("Could not read the file!");
@@ -32,13 +30,9 @@ public class JsonReader {
 
 	}
 
-	public JsonObject readFile() throws IOException {
-
-		Scanner sc = new Scanner(System.in);
-		String filename = sc.nextLine();
-
-		// String content = new String(Files.readAllBytes(Paths.get(filename)));
-
+	public static JsonObject readFile() throws IOException {
+		Scanner scanner = new Scanner(System.in);
+		String filename = scanner.nextLine();
 		String content = "";
 
 		try {
@@ -51,90 +45,70 @@ public class JsonReader {
 			e.printStackTrace();
 		}
 
-		JsonObject jo;
-		JsonElement je = new JsonParser().parse(content);
-		jo = je.getAsJsonObject();
+		JsonObject jsonObject;
+		JsonElement jsonElement = new JsonParser().parse(content);
+		jsonObject = jsonElement.getAsJsonObject();
 
-		sc.close();
-		return jo;
+		scanner.close();
+		return jsonObject;
 
 	}
 
-	private JsonArray getChildren(JsonObject j) {
-
+	private static JsonArray getChildren(JsonObject j) {
 		JsonArray children = j.get("children").getAsJsonArray();
-
 		return children;
 	}
 
-	private Object getLeft(JsonObject j) {
-
+	private static Object getLeft(JsonObject j) {
 		JsonObject left = j.get("left").getAsJsonObject();
-
 		return left;
 	}
 
-	private JsonObject getRight(JsonObject j) {
-
+	private static JsonObject getRight(JsonObject j) {
 		JsonObject right = j.get("right").getAsJsonObject();
-
 		return right;
 	}
 
-	private JsonObject getWhat(JsonObject j) {
-
+	private static JsonObject getWhat(JsonObject j) {
 		JsonObject what = j.get("what").getAsJsonObject();
-
 		return what;
 	}
 
-	private Object getOffset(JsonObject j) {
-
+	private static Object getOffset(JsonObject j) {
 		JsonObject offset = j.get("offset").getAsJsonObject();
-
 		return offset;
 	}
 
-	private Object getValueObject(JsonObject j) {
-
+	private static Object getValueObject(JsonObject j) {
 		JsonObject offset = j.get("value").getAsJsonObject();
-
 		return offset;
 	}
 
-	private String getValue(JsonObject j) {
-
+	private static String getValue(JsonObject j) {
 		String value = j.get("value").getAsString();
-
 		return value;
 	}
 
-	private String getOperator(JsonObject j) {
-
+	private static String getOperator(JsonObject j) {
 		String operator = j.get("operator").getAsString();
-
 		return operator;
 	}
 
-	private String getName(JsonObject j) {
-
+	private static String getName(JsonObject j) {
 		String name = j.get("name").getAsString();
-
 		return name;
 	}
 
-	private String getKind(JsonObject j) {
-
+	private static String getKind(JsonObject j) {
 		String kind = j.get("kind").getAsString();
-
 		return kind;
 	}
 
 	public static void main(String[] args) throws IOException {
-		JsonReader myProgram = new JsonReader();
-
-		myProgram.start();
-
+		//JsonReader myProgram = new JsonReader();
+		//myProgram.start();
+		
+		start();
 	}
 
 }
