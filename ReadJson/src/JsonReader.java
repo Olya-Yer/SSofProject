@@ -1,19 +1,17 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 public class JsonReader {
 
-	public static void start() throws IOException {
+	public static void startProgramm(String filepath) throws IOException {
 
-		JsonObject theWholeFile = readFile();
+		JsonObject theWholeFile = readFile(filepath);
 		if (theWholeFile != null) {
 			// System.out.println("The whole File:\n" + theWholeFile.toString());
 			// System.out.print("The whole File CHILDREN:\n" + getChildren(theWholeFile));
@@ -25,22 +23,16 @@ public class JsonReader {
 			System.out.println("Child.getName:\n" + getName(getWhat(getRight(child0))).toString());
 
 		} else {
-			System.out.println("Could not read the file!");
+			System.out.println("Could not read the file! File might not exist. Check and try again.");
 		}
 
 	}
 
-	public static JsonObject readFile() throws IOException {
-		Scanner scanner = new Scanner(System.in);
-		String filename = scanner.nextLine();
+	public static JsonObject readFile(String filepath) throws IOException {
 		String content = "";
 
 		try {
-			// Your path DONT DELETE IT
-			// content = new String(Files.readAllBytes(Paths.get("C:/Users/test/workspace/ReadJson/src/" + filename)));
-			
-			// My path DONT DELETE IT
-			content = new String(Files.readAllBytes(Paths.get("/home/gengar/workspace/eclipse-git/SSofProject/ReadJson/src/" + filename)));
+			content = new String(Files.readAllBytes(Paths.get(filepath)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -48,8 +40,6 @@ public class JsonReader {
 		JsonObject jsonObject;
 		JsonElement jsonElement = new JsonParser().parse(content);
 		jsonObject = jsonElement.getAsJsonObject();
-
-		scanner.close();
 		return jsonObject;
 
 	}
@@ -105,10 +95,19 @@ public class JsonReader {
 	}
 
 	public static void main(String[] args) throws IOException {
-		//JsonReader myProgram = new JsonReader();
-		//myProgram.start();
+		System.out.println("Current Working Directory = " + System.getProperty("user.dir"));
 		
-		start();
+		String filename;
+		if(args.length <= 0) {
+			System.out.println("No filename passed as parameter. Default filename 'slice1.json' got used.");
+			filename = "slice1.json";
+		} else {
+			filename = args[0];
+		}		
+		// HERE input validation and sanitation of the filename !!!
+		
+		String filepath = System.getProperty("user.dir").toString() + "/ReadJson/src/" + filename;
+		startProgramm(filepath);
 	}
 
 }
