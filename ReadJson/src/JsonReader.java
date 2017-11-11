@@ -12,19 +12,19 @@ public class JsonReader {
 	public static void startProgramm(String filepath) throws IOException {
 
 		JsonObject theWholeFile = readFile(filepath);
-		if (theWholeFile != null) {
-			// System.out.println("The whole File:\n" + theWholeFile.toString());
-			// System.out.print("The whole File CHILDREN:\n" + getChildren(theWholeFile));
-
-			JsonArray children = getChildren(theWholeFile);
-			JsonObject child0 = (JsonObject) children.get(0);
-			// System.out.print("Child0:\n" + getKind(child0));
-			// System.out.println("Child.getRight:\n" + getRight(child0).toString());
-			System.out.println("Child.getName:\n" + getName(getWhat(getRight(child0))).toString());
-
-		} else {
+		if (theWholeFile == null) {
 			System.out.println("Could not read the file! File might not exist. Check and try again.");
+			return;
 		}
+
+		// System.out.println("The whole File:\n" + theWholeFile.toString());
+		// System.out.print("The whole File CHILDREN:\n" + getChildren(theWholeFile));
+
+		JsonArray children = getChildren(theWholeFile);
+		JsonObject child0 = (JsonObject) children.get(0);
+		// System.out.print("Child0:\n" + getKind(child0));
+		// System.out.println("Child.getRight:\n" + getRight(child0).toString());
+		System.out.println("Child.getName:\n" + getName(getWhat(getRight(child0))).toString());
 
 	}
 
@@ -96,16 +96,16 @@ public class JsonReader {
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("Current Working Directory = " + System.getProperty("user.dir"));
-		
+
 		String filename;
-		if(args.length <= 0) {
+		if (args.length <= 0) {
 			System.out.println("No filename passed as parameter. Default filename 'slice1.json' got used.");
 			filename = "slice1.json";
 		} else {
 			filename = args[0];
-		}		
+		}
 		// HERE input validation and sanitation of the filename !!!
-		
+
 		String filepath = System.getProperty("user.dir").toString() + "/ReadJson/src/" + filename;
 		startProgramm(filepath);
 	}
