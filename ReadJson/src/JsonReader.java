@@ -90,8 +90,16 @@ public class JsonReader {
 				}
 			}
 			else if(getKind(child).equals("echo")){
-				// long code to get arguments as array , travers objects , find server or something
-			}
+				JsonArray arguments = getArguments(child);
+				int currentArgument=0;
+				do{
+				JsonObject argument = (JsonObject) arguments.get(currentArgument);
+				if( getKind(argument).equals("offsetlookup")){
+					entryPoint = getName(getWhat(argument));
+				}
+					
+				}while(currentArgument<arguments.size());
+				}
 			
 			currentChild++ ;
 			
@@ -145,7 +153,7 @@ public class JsonReader {
 		
 		try
 	    {
-			content = new String(Files.readAllBytes(Paths.get("C:/Users/test/workspace/ReadJson/src/slice1.json"+filename)));
+			content = new String(Files.readAllBytes(Paths.get("C:/Users/test/workspace/ReadJson/src/slice2.json"+filename)));
 	    }
 	    catch (IOException e)
 	    {
