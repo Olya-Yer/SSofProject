@@ -30,8 +30,10 @@ public class JsonReader {
 			//JsonObject child0 =  (JsonObject) children.get(0);
 			//System.out.println(getRight(child0).toString());
 			//System.out.println(getName(getWhat(getRight(child0))).toString());
-			System.out.println(findExpression(theWholeFile));
-			System.out.println(findEnteryPoint(theWholeFile));
+			//System.out.println(findExpression(theWholeFile));
+			//System.out.println(findEnteryPoint(theWholeFile));
+			System.out.println(determineSanitization(theWholeFile)+" and the entery point is "+findEnteryPoint(theWholeFile));
+			
 		
 			
 			
@@ -45,8 +47,6 @@ public class JsonReader {
 	
 	
 	public String findExpression(JsonObject file) throws IOException{		
-		// as all sql slices are of same form , this will work for them , but not for xss slices
-		
 		
 		JsonArray children = getChildren(file);
 		String expression = "";
@@ -75,7 +75,7 @@ public class JsonReader {
 		
 	}
 	public String findEnteryPoint(JsonObject file) throws IOException{
-		// same as previouse function , needs to be changed to work for xss
+		
 		JsonArray children = getChildren(file);
 		String entryPoint = "";
 		int size= children.size();
@@ -90,7 +90,7 @@ public class JsonReader {
 				}
 			}
 			else if(getKind(child).equals("echo")){
-				// long code to get "arguments" as array , travers objects , find "server" or something
+				// long code to get arguments as array , travers objects , find server or something
 			}
 			
 			currentChild++ ;
@@ -102,11 +102,32 @@ public class JsonReader {
 		
 	}
 	
-	public String determineSanitization(){
+	public String determineSanitization(JsonObject file) throws IOException{
+		String exeption = findExpression( file);
+		String sanitization = "";
+		String injectionType = "";
 		
-		// determine sanitization  based on entry point and expression 
-		
-		return "";
+		// SQL 
+		if(exeption.equals("mysql_query") || exeption.equals("mysql_unbuffered_query")||exeption.equals("mysql_db_query")){
+			sanitization = "mysql_escape_string or mysql_real_escape_string";
+			injectionType = "SQL Injection";
+		}else if(exeption.equals("mysqli_query") || exeption.equals("mysqli_real_query")||exeption.equals("mysqli_master_query")||exeption.equals("mysqli_multi_query")){
+			sanitization = "mysqli_escape_string or mysqli_real_escape_string";
+			injectionType = "SQL Injection";
+		}else if(exeption.equals("mysqli_stmt_execute") || exeption.equals("mysqli_execute")){
+			sanitization = "mysqli_stmt_bind_param";
+			injectionType = "SQL Injection";
+		}else if(exeption.equals("mysqli::query") || exeption.equals("mysqli::multi_query")|| exeption.equals("mysqli::real_query")){
+			sanitization = "mysqli::escape_string or mysqli::real_escape_string";
+			injectionType = "SQL Injection";
+		}
+		//XSS
+		else if(exeption.equals("echo") || exeption.equals("print") || exeption.equals("printf") || exeption.equals("die") || exeption.equals("die")){
+			sanitization = "htmlentities or htmlspecialchars or strip_tags or urlencode";
+			injectionType = "Cross site scripting";
+		}
+				
+		return "Injection type is "+injectionType+" Functions for sanitizations are "+ sanitization ;
 	}
 	
 	
