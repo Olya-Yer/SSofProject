@@ -16,14 +16,14 @@ public class JsonReader {
 	public static void startProgramm(String filepath) throws IOException {
 
 		JsonObject theWholeFile = readFile(filepath);
-		
+
 		if (theWholeFile == null) {
 			System.out.println("Could not read the file! File might not exist. Check and try again.");
 			// returns if the read file could not be found
 			return;
 		}
 		setFileAsJsonObject(theWholeFile);
-		
+
 		// System.out.println(theWholeFile.toString());
 		// System.out.print(getChildren(theWholeFile));
 
@@ -242,20 +242,44 @@ public class JsonReader {
 		return kind;
 	}
 
+	/*
+	 * Filename has to start with a letter, either lowercase or uppercase. Filename
+	 * has to end with '.json' and can contain any combination of lowercase letters,
+	 * uppercase letters, numbers and '.', '-' and '_'.
+	 */
+	private static boolean inputValidation(String filename) {
+		final String REGEX_FOR_FILENAMES = "^([a-zA-Z])+(\\w|\\.|\\-)*(.json)$";
+		return filename.matches(REGEX_FOR_FILENAMES);
+	}
+
 	public static void main(String[] args) throws IOException {
 		System.out.println("Current Working Directory = " + System.getProperty("user.dir"));
-
 		String filename;
+		// every additional argument except the filename passed on to the java call gets
+		// ignored
 		if (args.length <= 0) {
 			System.out.println("No filename passed as parameter. Default filename 'slice1.json' got used.");
+			// default value. is used when there is no additional parameter with the java
+			// call
 			filename = "slice1.json";
+		} else if (args.length == 1) {
+			filename = args[0];
 		} else {
 			filename = args[0];
+			System.out.println("Just the filename gets processed. Every additional argument gets ignored.");
 		}
-		// HERE input validation and sanitation of the filename !!!
 
-		String filepath = System.getProperty("user.dir").toString() + "/ReadJson/src/" + filename;
-		startProgramm(filepath);
+		// HERE input validation and sanitation of the filename !!!
+		// MAYBE we need more, maybe not. this is just a quick sanitization
+		if (inputValidation(filename)) {
+			String filepath = System.getProperty("user.dir").toString() + "/ReadJson/src/" + filename;
+			startProgramm(filepath);
+		} else {
+			System.out.println("The entered filename is not valid.");
+			System.out.println(
+					"It has to start with a letter a-z or A-Z and can only contain capital and lowercase letters, as well as numbers, '.', '_' and '-'.");
+		}
+		
 	}
 
 }
