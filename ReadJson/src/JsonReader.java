@@ -11,7 +11,7 @@ public class JsonReader {
 
 	// GLOBAL STATIC VARIABLE where the whole file gets stored as a JSON object, so
 	// it can be accessed from everywhere
-	private static JsonObject fileAsJsonObject;
+	// private static JsonObject fileAsJsonObject;
 
 	public static void startProgramm(String filepath) throws IOException {
 
@@ -22,7 +22,7 @@ public class JsonReader {
 			// returns if the read file could not be found
 			return;
 		}
-		setFileAsJsonObject(theWholeFile);
+		// setFileAsJsonObject(theWholeFile);
 
 		// System.out.println(theWholeFile.toString());
 		// System.out.print(getChildren(theWholeFile));
@@ -42,7 +42,7 @@ public class JsonReader {
 		System.out.println("childName: " + childName + "\n");
 
 		System.out.println(
-				determineSanitization(theWholeFile) + " and the entery point is " + findEnteryPoint(theWholeFile));
+				determineSanitization(theWholeFile) + " and the entry point is " + findEntryPoint(theWholeFile));
 
 	}
 
@@ -74,7 +74,7 @@ public class JsonReader {
 
 	}
 
-	public static String findEnteryPoint(JsonObject file) throws IOException {
+	public static String findEntryPoint(JsonObject file) throws IOException {
 
 		JsonArray children = getChildren(file);
 		String entryPoint = "";
@@ -148,7 +148,7 @@ public class JsonReader {
 			content = new String(Files.readAllBytes(Paths.get(filepath)));
 		} catch (IOException e) {
 			// e.printStackTrace();
-			System.out.println("FAIL");
+			System.out.println("FAIL. Could not read the file.");
 			return null;
 		}
 
@@ -157,6 +157,7 @@ public class JsonReader {
 		return jsonObject;
 	}
 
+	/*
 	private static JsonObject getFileAsJsonObject() {
 		return fileAsJsonObject;
 	}
@@ -164,6 +165,7 @@ public class JsonReader {
 	private static void setFileAsJsonObject(JsonObject fileAsJsonObject) {
 		JsonReader.fileAsJsonObject = fileAsJsonObject;
 	}
+	*/
 
 	private static JsonArray getChildren(JsonObject j) {
 
@@ -231,7 +233,9 @@ public class JsonReader {
 	private static String getName(JsonObject j) {
 
 		String name = j.get("name").getAsString();
-
+		if(name.charAt(0) == '_') {
+			name  = "$" + name;
+		}
 		return name;
 	}
 
