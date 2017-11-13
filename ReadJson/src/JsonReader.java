@@ -1,15 +1,6 @@
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.Scanner;
-
-
-
-
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -18,227 +9,233 @@ import com.google.gson.JsonParser;
 
 public class JsonReader {
 
-	public void start() throws IOException {
+	// GLOBAL STATIC VARIABLE where the whole file gets stored as a JSON object, so
+	// it can be accessed from everywhere
+	private static JsonObject fileAsJsonObject;
 
-		JsonObject theWholeFile = readFile();
-		if (theWholeFile != null) {
+	public static void startProgramm(String filepath) throws IOException {
+
+		JsonObject theWholeFile = readFile(filepath);
 		
-			//System.out.println(theWholeFile.toString());
-			//System.out.print(getChildren(theWholeFile));			
-						
-			//JsonArray children = getChildren(theWholeFile);
-			//JsonObject child0 =  (JsonObject) children.get(0);
-			//System.out.println(getRight(child0).toString());
-			//System.out.println(getName(getWhat(getRight(child0))).toString());
-			//System.out.println(findExpression(theWholeFile));
-			//System.out.println(findEnteryPoint(theWholeFile));
-			System.out.println(determineSanitization(theWholeFile)+" and the entery point is "+findEnteryPoint(theWholeFile));
-			
-		
-			
-			
-		} else {
-			System.out.println("Could not read the file!");
+		if (theWholeFile == null) {
+			System.out.println("Could not read the file! File might not exist. Check and try again.");
+			// returns if the read file could not be found
+			return;
 		}
+		setFileAsJsonObject(theWholeFile);
+		
+		// System.out.println(theWholeFile.toString());
+		// System.out.print(getChildren(theWholeFile));
 
-		
+		// JsonArray children = getChildren(theWholeFile);
+		// JsonObject child0 = (JsonObject) children.get(0);
+		// System.out.println(getRight(child0).toString());
+		// System.out.println(getName(getWhat(getRight(child0))).toString());
+		// System.out.println(findExpression(theWholeFile));
+		// System.out.println(findEnteryPoint(theWholeFile));
+
+		JsonArray children = getChildren(theWholeFile);
+		JsonObject child0 = (JsonObject) children.get(0);
+		// System.out.print("Child0:\n" + getKind(child0));
+		// System.out.println("Child.getRight:\n" + getRight(child0).toString());
+		String childName = getName(getWhat(getRight(child0)));
+		System.out.println("childName: " + childName + "\n");
+
+		System.out.println(
+				determineSanitization(theWholeFile) + " and the entery point is " + findEnteryPoint(theWholeFile));
+
 	}
-	
-	
-	
-	public String findExpression(JsonObject file) throws IOException{		
-		
+
+	public static String findExpression(JsonObject file) throws IOException {
+
 		JsonArray children = getChildren(file);
 		String expression = "";
-		int size= children.size();
-		int currentChild = 0 ;
-		do{
-			JsonObject child =  (JsonObject) children.get(currentChild);
-			if(getKind(child).equals("assign")){
-				
-				if (getKind(getRight(child)).equals("call")){
-					expression =  getName(getWhat(getRight(child)));
-					
+		int size = children.size();
+		int currentChild = 0;
+		do {
+			JsonObject child = (JsonObject) children.get(currentChild);
+			if (getKind(child).equals("assign")) {
+
+				if (getKind(getRight(child)).equals("call")) {
+					expression = getName(getWhat(getRight(child)));
+
 				}
-			}else if(getKind(child).equals("call")){
-				expression =  getName(getWhat(child));
+			} else if (getKind(child).equals("call")) {
+				expression = getName(getWhat(child));
+			} else if (getKind(child).equals("echo")) {
+				expression = getKind(child);
 			}
-			else if(getKind(child).equals("echo")){
-				expression =  getKind(child);
-			}
-			
-			currentChild++ ;
-			
-		}	while(currentChild<size);		
-		
+
+			currentChild++;
+
+		} while (currentChild < size);
+
 		return expression;
-		
+
 	}
-	public String findEnteryPoint(JsonObject file) throws IOException{
-		
+
+	public static String findEnteryPoint(JsonObject file) throws IOException {
+
 		JsonArray children = getChildren(file);
 		String entryPoint = "";
-		int size= children.size();
-		int currentChild = 0 ;
-		do{
-			JsonObject child =  (JsonObject) children.get(currentChild);
-			if(getKind(child).equals("assign")){
-				
-				if (getKind(getRight(child)).equals("offsetlookup")){
-					entryPoint =  getName(getWhat(getRight(child)));
-					
+		int size = children.size();
+		int currentChild = 0;
+		do {
+			JsonObject child = (JsonObject) children.get(currentChild);
+			if (getKind(child).equals("assign")) {
+
+				if (getKind(getRight(child)).equals("offsetlookup")) {
+					entryPoint = getName(getWhat(getRight(child)));
+
 				}
-			}
-			else if(getKind(child).equals("echo")){
+			} else if (getKind(child).equals("echo")) {
 				JsonArray arguments = getArguments(child);
-				int currentArgument=0;
-				do{
-				JsonObject argument = (JsonObject) arguments.get(currentArgument);
-				if( getKind(argument).equals("offsetlookup")){
-					entryPoint = getName(getWhat(argument));
-				}
-					
-				}while(currentArgument<arguments.size());
-				}
-			
-			currentChild++ ;
-			
-		}	while(currentChild<size);		
-		
+				int currentArgument = 0;
+				do {
+					JsonObject argument = (JsonObject) arguments.get(currentArgument);
+					if (getKind(argument).equals("offsetlookup")) {
+						entryPoint = getName(getWhat(argument));
+					}
+
+				} while (currentArgument < arguments.size());
+			}
+
+			currentChild++;
+
+		} while (currentChild < size);
+
 		return entryPoint;
-		
-		
+
 	}
-	
-	public String determineSanitization(JsonObject file) throws IOException{
-		String exeption = findExpression( file);
+
+	public static String determineSanitization(JsonObject file) throws IOException {
+		String exeption = findExpression(file);
 		String sanitization = "";
 		String injectionType = "";
-		
-		// SQL 
-		if(exeption.equals("mysql_query") || exeption.equals("mysql_unbuffered_query")||exeption.equals("mysql_db_query")){
+
+		// SQL
+		if (exeption.equals("mysql_query") || exeption.equals("mysql_unbuffered_query")
+				|| exeption.equals("mysql_db_query")) {
 			sanitization = "mysql_escape_string or mysql_real_escape_string";
 			injectionType = "SQL Injection";
-		}else if(exeption.equals("mysqli_query") || exeption.equals("mysqli_real_query")||exeption.equals("mysqli_master_query")||exeption.equals("mysqli_multi_query")){
+		} else if (exeption.equals("mysqli_query") || exeption.equals("mysqli_real_query")
+				|| exeption.equals("mysqli_master_query") || exeption.equals("mysqli_multi_query")) {
 			sanitization = "mysqli_escape_string or mysqli_real_escape_string";
 			injectionType = "SQL Injection";
-		}else if(exeption.equals("mysqli_stmt_execute") || exeption.equals("mysqli_execute")){
+		} else if (exeption.equals("mysqli_stmt_execute") || exeption.equals("mysqli_execute")) {
 			sanitization = "mysqli_stmt_bind_param";
 			injectionType = "SQL Injection";
-		}else if(exeption.equals("mysqli::query") || exeption.equals("mysqli::multi_query")|| exeption.equals("mysqli::real_query")){
+		} else if (exeption.equals("mysqli::query") || exeption.equals("mysqli::multi_query")
+				|| exeption.equals("mysqli::real_query")) {
 			sanitization = "mysqli::escape_string or mysqli::real_escape_string";
 			injectionType = "SQL Injection";
 		}
-		//XSS
-		else if(exeption.equals("echo") || exeption.equals("print") || exeption.equals("printf") || exeption.equals("die") || exeption.equals("die")){
+		// XSS
+		else if (exeption.equals("echo") || exeption.equals("print") || exeption.equals("printf")
+				|| exeption.equals("die") || exeption.equals("die")) {
 			sanitization = "htmlentities or htmlspecialchars or strip_tags or urlencode";
 			injectionType = "Cross site scripting";
 		}
-				
-		return "Injection type is "+injectionType+" Functions for sanitizations are "+ sanitization ;
-	}
-	
-	
-	
-	
 
-	public JsonObject readFile() throws IOException {
-				
-		Scanner sc = new Scanner(System.in);
-		String filename = sc.nextLine();
-		
-		//String content = new String(Files.readAllBytes(Paths.get(filename)));
-		
-		String content="";
-		
-		try
-	    {
-			content = new String(Files.readAllBytes(Paths.get("C:/Users/test/workspace/ReadJson/src/slice2.json"+filename)));
-	    }
-	    catch (IOException e)
-	    {
-	        e.printStackTrace();
-	    }		
-		
-		JsonObject jo;
-        JsonElement je = new JsonParser().parse(content);
-        jo = je.getAsJsonObject();
-		
-		
-        sc.close();
-		return jo;
-		
+		return "Injection type is " + injectionType + " Functions for sanitizations are " + sanitization;
 	}
-	private  JsonArray getChildren(JsonObject j) {
+
+	public static JsonObject readFile(String filepath) throws IOException {
+
+		String content = "";
+
+		try {
+			content = new String(Files.readAllBytes(Paths.get(filepath)));
+		} catch (IOException e) {
+			// e.printStackTrace();
+			System.out.println("FAIL");
+			return null;
+		}
+
+		JsonElement jsonElement = new JsonParser().parse(content);
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		return jsonObject;
+	}
+
+	private static JsonObject getFileAsJsonObject() {
+		return fileAsJsonObject;
+	}
+
+	private static void setFileAsJsonObject(JsonObject fileAsJsonObject) {
+		JsonReader.fileAsJsonObject = fileAsJsonObject;
+	}
+
+	private static JsonArray getChildren(JsonObject j) {
 
 		JsonArray children = j.get("children").getAsJsonArray();
 
 		return children;
 	}
-	private  JsonArray getArguments(JsonObject j) {
+
+	private static JsonArray getArguments(JsonObject j) {
 
 		JsonArray arguments = j.get("arguments").getAsJsonArray();
 
 		return arguments;
 	}
 
-	private  Object getLeft(JsonObject j) {
+	private static Object getLeft(JsonObject j) {
 
 		JsonObject left = j.get("left").getAsJsonObject();
 
 		return left;
 	}
 
-	private  JsonObject getRight(JsonObject j) {
+	private static JsonObject getRight(JsonObject j) {
 
 		JsonObject right = j.get("right").getAsJsonObject();
 
 		return right;
 	}
 
-	private  JsonObject getWhat(JsonObject j) {
+	private static JsonObject getWhat(JsonObject j) {
 
 		JsonObject what = j.get("what").getAsJsonObject();
 
 		return what;
 	}
 
-	private  Object getOffset(JsonObject j) {
+	private static Object getOffset(JsonObject j) {
 
 		JsonObject offset = j.get("offset").getAsJsonObject();
 
 		return offset;
 	}
 
-	private  Object getValueObject(JsonObject j) {
+	private static Object getValueObject(JsonObject j) {
 
 		JsonObject offset = j.get("value").getAsJsonObject();
 
 		return offset;
 	}
 
-	private  String getValue(JsonObject j) {
+	private static String getValue(JsonObject j) {
 
 		String value = j.get("value").getAsString();
 
 		return value;
 	}
 
-	private  String getOperator(JsonObject j) {
+	private static String getOperator(JsonObject j) {
 
 		String operator = j.get("operator").getAsString();
 
 		return operator;
 	}
 
-	private  String getName(JsonObject j) {
+	private static String getName(JsonObject j) {
 
 		String name = j.get("name").getAsString();
 
 		return name;
 	}
 
-	private  String getKind(JsonObject j) {
+	private static String getKind(JsonObject j) {
 
 		String kind = j.get("kind").getAsString();
 
@@ -246,10 +243,19 @@ public class JsonReader {
 	}
 
 	public static void main(String[] args) throws IOException {
-		JsonReader myProgram = new JsonReader();
+		System.out.println("Current Working Directory = " + System.getProperty("user.dir"));
 
-		myProgram.start();
+		String filename;
+		if (args.length <= 0) {
+			System.out.println("No filename passed as parameter. Default filename 'slice1.json' got used.");
+			filename = "slice1.json";
+		} else {
+			filename = args[0];
+		}
+		// HERE input validation and sanitation of the filename !!!
 
+		String filepath = System.getProperty("user.dir").toString() + "/ReadJson/src/" + filename;
+		startProgramm(filepath);
 	}
 
 }
